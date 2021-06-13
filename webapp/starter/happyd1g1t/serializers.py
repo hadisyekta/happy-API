@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from .models import Team, User
+from .models import Team, User, Happiness
 
 
 class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Organisation
+        model = Team
         fields = ('name', 'slug', 'is_active')
 
 class UserSerializer(serializers.ModelSerializer):
@@ -17,3 +17,9 @@ class UserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True}
         }
         read_only_fields = ('is_active',)
+
+
+class HappinessSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Happiness
+        fields = ('happiness_level', 'date', 'user')
