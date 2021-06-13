@@ -22,8 +22,8 @@ class User(AbstractBaseUser):
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True)
 
-    email = models.EmailField(unique=True, verbose_name='email address', max_length=255)
     full_name = models.CharField(max_length=255)
+    email = models.EmailField(unique=True, verbose_name='email address', max_length=255)
 
     is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
@@ -45,16 +45,23 @@ class Team(models.Model):
     name = models.CharField(unique=True, max_length=100)
     slug = models.SlugField(unique=True, null=True, blank=True)
     members = models.ManyToManyField(User)
-
     is_active = models.BooleanField(default=False)
+    @property
+    def team_happiness_level(self):
+        members_count = self.members.count
+        happiness_level = self.members.count
+        return happiness_level / members_count 
+
+    # def get_members_happiness(self)
 
 
 class Happiness(models.Model):
     class Meta:
         ordering = ['happiness_level']
+        unique_together = ('user', 'date')
 
     def __str__(self):
-        return self.level
+        return str(self.happiness_level)
 
     HAPPINESS_LEVEL = (
         (PLEASURE, 'Pleasure'),
@@ -63,6 +70,6 @@ class Happiness(models.Model):
         (ULTIMATE_GOOD, 'Ultimate Good'),
     )
 
-    happiness_level = models.IntegerField(default=0, choices=HAPPINESS_LEVEL)
+    happiness_level = models.IntegerField(default=1, choices=HAPPINESS_LEVEL)
     user = models.ForeignKey(User, on_delete=models.CASCADE) 
     date = models.DateField("Date", default=datetime.date.today)
