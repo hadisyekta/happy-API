@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class Hapyd1G1TConfig(AppConfig):
-    name = 'hapyd1g1t'
+class Happyd1G1TConfig(AppConfig):
+    name = 'happyd1g1t'

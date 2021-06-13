@@ -4,7 +4,12 @@ from django.db import models
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
+import datetime
 
+PLEASURE = 1
+PASSION = 2
+PURPOSE = 3
+ULTIMATE_GOOD = 4
 
 class User(AbstractBaseUser):
     
@@ -44,13 +49,20 @@ class Team(models.Model):
     is_active = models.BooleanField(default=False)
 
 
-# class UserTeam(models.Model):
+class Happiness(models.Model):
+    class Meta:
+        ordering = ['happiness_level']
 
-#     class Meta:
-#         unique_together = ("team", "user")
+    def __str__(self):
+        return self.level
 
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     joined = models.DateTimeField(auto_now_add=True)
-#     team = models.ForeignKey(Team)
-#     user = models.ForeignKey(User)
-#     is_owner = models.BooleanField(default=False)
+    HAPPINESS_LEVEL = (
+        (PLEASURE, 'Pleasure'),
+        (PASSION, 'Passion'),
+        (PURPOSE, 'Purpose'),
+        (ULTIMATE_GOOD, 'Ultimate Good'),
+    )
+
+    happiness_level = models.IntegerField(default=0, choices=HAPPINESS_LEVEL)
+    user = models.ForeignKey(User, on_delete=models.CASCADE) 
+    date = models.DateField("Date", default=datetime.date.today)
