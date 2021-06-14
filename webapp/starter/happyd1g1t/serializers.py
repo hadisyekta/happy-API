@@ -3,7 +3,8 @@ import datetime
 from rest_framework import serializers
 from rest_framework.validators import UniqueForDateValidator
 
-from .models import Team, Happiness, HAPPINESS_LEVEL
+from .models import Employee, Team, Happiness, HAPPINESS_LEVEL
+
 
 class TeamSerializer(serializers.ModelSerializer):
 

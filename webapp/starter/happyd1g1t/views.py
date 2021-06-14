@@ -1,6 +1,8 @@
+import datetime
+
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.db.models import Count, Q, Avg
+from django.db.models import Count, Q, Avg, Sum
 
 from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
@@ -16,9 +18,11 @@ def apiOverview(request):
     api_urls = {
         'Create': 'create/',
         'Details': 'details/<str:pk>',
-        'All': '',
+        'All Happiness': '',
         'a:Statistic' : 'statistic/',
-        'b:Average': 'avg',
+        'b:Average': 'allavg',
+        'Happiness Per team': 'avg',
+        'Today Happiness': 'todayavg',
     }
 
     return Response(api_urls)
@@ -70,17 +74,36 @@ def HappinessCreate(request):
 
     return Response(serializer.data)
 
+
 @api_view(['GET'])
-def HappinessAVG(request):
+def HappinessAVGTeam(request):
     h = Happiness.objects.all()
-    happy_avg_team = Happiness.objects.annotate(num_team=Count('team')).aggregate(Avg('happiness_level'))
-    return Response(happy_avg_team)
+    today = datetime.date.today()
+    happiness_avg_perteam = Happiness.objects.values('team').annotate(happiness_avg_perteam=Avg('happiness_level')).order_by('-team')
+    # happiness_avg_allteam = happiness_avg_perteam.aggregate(happiness_avg_allteam=Avg('happiness_avg_perteam'))
+    # data = dict(happiness_avg_allteam= happiness_avg_allteam, happiness_avg_perteam=happiness_avg_perteam)
+    return Response(happiness_avg_perteam)
+
+
+@api_view(['GET'])
+def HappinessAggregateAVG(request):
+    h = Happiness.objects.all()
+    today = datetime.date.today()
+    happiness_avg_perteam = Happiness.objects.values('team').annotate(happiness_avg_perteam=Avg('happiness_level')).order_by('-team')
+    happiness_avg_allteam = happiness_avg_perteam.aggregate(happiness_avg_allteam=Avg('happiness_avg_perteam'))
+    data = dict(happiness_avg_allteam= happiness_avg_allteam, happiness_avg_perteam=happiness_avg_perteam)
+    return Response(happiness_avg_allteam)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def HappinessStat(request):
-    happiness = Happiness.objects.all()
-    
-    serializer = HappinessSerializer(happiness, many=True)
-    return Response(serializer.data)
+
+    happiness_avg = Happiness.objects.annotate(happiness_avg=Avg('happiness_level'))
+    happiness_level_user_count = Happiness.objects.values('happiness_level').annotate(happiness_count=Count('user')).order_by('-happiness_level')
+
+    print('happiness_avg', happiness_avg)
+    print('happiness_level_user_count', happiness_level_user_count)
+    # happiness_avg_allteam = happiness_avg_perteam.aggregate(happiness_avg_allteam=Avg('happiness_avg_perteam'))
+    data = dict(happiness_avg=happiness_avg)
+    return Response({})

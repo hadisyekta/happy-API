@@ -5,8 +5,8 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class HAPPINESS_LEVEL:
-    HIGHLY_UNSATISFACTORY= 1
-    MOSTLY_UNSATISFACTORY= 2
+    HIGHLY_UNSATISFACTORY = 1
+    MOSTLY_UNSATISFACTORY = 2
     SOMEWHAT_UNSATISFACTORY = 3
     UNSATISFACTORY = 4
     NEUTRAL = 5
@@ -46,14 +46,6 @@ class Team(models.Model):
     # members = models.ManyToManyField(User, related_name = 'team')
     is_active = models.BooleanField(default=False)
 
-    @property
-    def team_happiness_level(self):
-        members_count = self.members.count
-        happiness_level = self.members.count
-        return happiness_level / members_count 
-
-    # def get_members_happiness(self):
-
 
 class Employee(models.Model):
     def __str__(self):
@@ -68,8 +60,8 @@ class Happiness(models.Model):
         ordering = ['happiness_level']
         unique_together = ('user', 'date')
 
-    # def __str__(self):
-    #     return str(self.happiness_level)
+    def __str__(self):
+        return str(self.happiness_level)
 
     def save(self, *args, **kwargs):
         self.team = self.user.team
