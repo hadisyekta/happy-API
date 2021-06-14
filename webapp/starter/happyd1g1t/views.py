@@ -1,14 +1,13 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from rest_framework import status, permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import UserSerializer, TeamSerializer, HappinessSerializer
+
+from .serializers import TeamSerializer, HappinessSerializer
 from .models import Happiness
-from django.db.models import Q
 
 
 @api_view(['GET'])
@@ -71,7 +70,7 @@ def HappinessCreate(request):
 @api_view(['GET'])
 def HappinessAVG(request):
     # h = Happiness.objects.all()
-    h= Happiness.objects.raw('SELECT * FROM happyd1g1t_happiness')
+    h= Happiness.objects.raw('SELECT * FROM happyd1g1t_happiness  ')
     # q[0].entry__count
     print(h, "count", h[0], request.user, "level",  h[0].happiness_level)
     serializer = HappinessSerializer(h, many=True)

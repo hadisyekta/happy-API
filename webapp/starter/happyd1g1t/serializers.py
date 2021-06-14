@@ -1,7 +1,9 @@
-from rest_framework import serializers
-from .models import Team, User, Happiness
-from rest_framework.validators import UniqueForDateValidator
 import datetime
+from rest_framework import serializers
+from rest_framework.validators import UniqueForDateValidator
+
+from .models import Team, Happiness
+
 
 
 class TeamSerializer(serializers.ModelSerializer):
@@ -10,15 +12,15 @@ class TeamSerializer(serializers.ModelSerializer):
         model = Team
         fields = ('name', 'slug', 'is_active')
 
-class UserSerializer(serializers.ModelSerializer):
+# class UserSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = User
-        fields = ('email', 'full_name', 'password', 'is_active')
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
-        read_only_fields = ('is_active',)
+#     class Meta:
+#         model = User
+#         fields = ('email', 'full_name', 'password', 'is_active')
+#         extra_kwargs = {
+#             'password': {'write_only': True}
+#         }
+#         read_only_fields = ('is_active',)
 
 
 class HappinessSerializer(serializers.ModelSerializer):

@@ -1,35 +1,33 @@
-from django.db import models
-
-# Create your models here.
 import uuid
-from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
 import datetime
+from django.db import models
 
-PLEASURE = 1
-PASSION = 2
-PURPOSE = 3
-ULTIMATE_GOOD = 4
+from django.contrib.auth.models import User
 
-class User(AbstractBaseUser):
-    
-    class Meta:
-        ordering = ['full_name']
+class HAPPINESS_LEVEL:
+    HIGHLY_UNSATISFACTORY= 1
+    MOSTLY_UNSATISFACTORY= 2
+    SOMEWHAT_UNSATISFACTORY = 3
+    UNSATISFACTORY = 4
+    NEUTRAL = 5
+    SATISFACTORY = 6
+    SOMEWAHT_SATISFACTORY = 7
+    MODERATELY_SATISFACTORY = 8
+    MOSTLY_SATISFACTORY = 9
+    HIGHLY_SATISFACTORY = 10
 
-    def __str__(self):
-        return self.full_name
-
-    created = models.DateTimeField(auto_now_add=True, db_index=True)
-    modified = models.DateTimeField(auto_now=True)
-
-    full_name = models.CharField(max_length=255)
-    email = models.EmailField(unique=True, verbose_name='email address', max_length=255)
-
-    is_active = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['email', 'full_name']
+    choices = [
+        (HIGHLY_UNSATISFACTORY,'Highly Unsatisfactory'), 
+        (MOSTLY_UNSATISFACTORY,  'Mostly Unsatisfactory'), 
+        (SOMEWHAT_UNSATISFACTORY, 'Somewhat Unsatisfactory'),
+        (UNSATISFACTORY, 'Unsatisfactory'),
+        (NEUTRAL, 'Neutral'), 
+        (SATISFACTORY, 'Satisfactory'), 
+        (SOMEWAHT_SATISFACTORY, 'Somewhat Satisfactory'), 
+        (MODERATELY_SATISFACTORY, 'Moderately Satisfactory'), 
+        (MOSTLY_SATISFACTORY, 'Mostly Satisfactory'),
+        (HIGHLY_SATISFACTORY, 'Highly Satisfactory'), 
+    ]
 
 class Team(models.Model):
     class Meta:
@@ -52,7 +50,8 @@ class Team(models.Model):
         happiness_level = self.members.count
         return happiness_level / members_count 
 
-    # def get_members_happiness(self)
+    # def get_members_happiness(self):
+
 
 
 class Happiness(models.Model):
@@ -63,13 +62,6 @@ class Happiness(models.Model):
     def __str__(self):
         return str(self.happiness_level)
 
-    HAPPINESS_LEVEL = (
-        (PLEASURE, 'Pleasure'),
-        (PASSION, 'Passion'),
-        (PURPOSE, 'Purpose'),
-        (ULTIMATE_GOOD, 'Ultimate Good'),
-    )
-
-    happiness_level = models.IntegerField(default=1, choices=HAPPINESS_LEVEL)
+    happiness_level = models.IntegerField(default=HAPPINESS_LEVEL.NEUTRAL, choices=HAPPINESS_LEVEL.choices)
     user = models.ForeignKey(User, on_delete=models.CASCADE) 
     date = models.DateField("Date", default=datetime.date.today)
