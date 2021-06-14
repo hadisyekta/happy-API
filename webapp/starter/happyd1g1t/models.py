@@ -29,6 +29,7 @@ class HAPPINESS_LEVEL:
         (HIGHLY_SATISFACTORY, 'Highly Satisfactory'), 
     ]
 
+
 class Team(models.Model):
     class Meta:
         ordering = ['name']
@@ -42,8 +43,9 @@ class Team(models.Model):
 
     name = models.CharField(unique=True, max_length=100)
     slug = models.SlugField(unique=True, null=True, blank=True)
-    members = models.ManyToManyField(User)
+    # members = models.ManyToManyField(User, related_name = 'team')
     is_active = models.BooleanField(default=False)
+
     @property
     def team_happiness_level(self):
         members_count = self.members.count
@@ -53,15 +55,27 @@ class Team(models.Model):
     # def get_members_happiness(self):
 
 
+class Employee(models.Model):
+    def __str__(self):
+        return str(self.user.first_name + " " + self.user.last_name)
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+
 
 class Happiness(models.Model):
     class Meta:
         ordering = ['happiness_level']
         unique_together = ('user', 'date')
 
-    def __str__(self):
-        return str(self.happiness_level)
+    # def __str__(self):
+    #     return str(self.happiness_level)
+
+    def save(self, *args, **kwargs):
+        self.team = self.user.team
+        super().save(*args, **kwargs)
 
     happiness_level = models.IntegerField(default=HAPPINESS_LEVEL.NEUTRAL, choices=HAPPINESS_LEVEL.choices)
-    user = models.ForeignKey(User, on_delete=models.CASCADE) 
+    user = models.ForeignKey(Employee, on_delete=models.CASCADE) 
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
     date = models.DateField("Date", default=datetime.date.today)

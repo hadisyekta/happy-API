@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Avg
 
 from rest_framework import status, permissions
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from .serializers import TeamSerializer, HappinessSerializer
 from .models import Happiness
@@ -23,15 +24,17 @@ def apiOverview(request):
     return Response(api_urls)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def HappinessList(request):
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     happiness = Happiness.objects.all()
     serializer = HappinessSerializer(happiness, many=True)
     return Response(serializer.data)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def HappinessDetail(request, pk):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     try:
         happiness = Happiness.objects.get(id=pk)
@@ -55,8 +58,8 @@ def HappinessDetail(request, pk):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def HappinessCreate(request):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer = HappinessSerializer(data=request.data)
 
     def happiness_create(self, serializer):
@@ -69,17 +72,15 @@ def HappinessCreate(request):
 
 @api_view(['GET'])
 def HappinessAVG(request):
-    # h = Happiness.objects.all()
-    h= Happiness.objects.raw('SELECT * FROM happyd1g1t_happiness  ')
-    # q[0].entry__count
-    print(h, "count", h[0], request.user, "level",  h[0].happiness_level)
-    serializer = HappinessSerializer(h, many=True)
-    return Response(serializer.data)
+    h = Happiness.objects.all()
+    happy_avg_team = Happiness.objects.annotate(num_team=Count('team')).aggregate(Avg('happiness_level'))
+    return Response(happy_avg_team)
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def HappinessStat(request):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     happiness = Happiness.objects.all()
+    
     serializer = HappinessSerializer(happiness, many=True)
     return Response(serializer.data)
