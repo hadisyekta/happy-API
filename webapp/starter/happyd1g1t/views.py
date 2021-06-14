@@ -51,7 +51,7 @@ def HappinessDetail(request, pk):
 
     elif request.method == 'PUT':
         serializer = HappinessSerializer(happiness, data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -67,7 +67,7 @@ def HappinessCreate(request):
     serializer = HappinessSerializer(data=request.data)
 
     def happiness_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(user=self.request.user, team=self.request.user.employee.team, date=datetime.date.today())
 
     if serializer.is_valid(raise_exception=True):
         serializer.save()
@@ -78,7 +78,6 @@ def HappinessCreate(request):
 @api_view(['GET'])
 def HappinessAVGTeam(request):
     h = Happiness.objects.all()
-    today = datetime.date.today()
     happiness_avg_perteam = Happiness.objects.values('team').annotate(happiness_avg_perteam=Avg('happiness_level')).order_by('-team')
     # happiness_avg_allteam = happiness_avg_perteam.aggregate(happiness_avg_allteam=Avg('happiness_avg_perteam'))
     # data = dict(happiness_avg_allteam= happiness_avg_allteam, happiness_avg_perteam=happiness_avg_perteam)
@@ -98,12 +97,10 @@ def HappinessAggregateAVG(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def HappinessStat(request):
-
-    happiness_avg = Happiness.objects.annotate(happiness_avg=Avg('happiness_level'))
-    happiness_level_user_count = Happiness.objects.values('happiness_level').annotate(happiness_count=Count('user')).order_by('-happiness_level')
-
-    print('happiness_avg', happiness_avg)
-    print('happiness_level_user_count', happiness_level_user_count)
-    # happiness_avg_allteam = happiness_avg_perteam.aggregate(happiness_avg_allteam=Avg('happiness_avg_perteam'))
-    data = dict(happiness_avg=happiness_avg)
-    return Response({})
+    # if user has not team what should I do?! how can I reais 404 without try catch?
+    team = request.user.employee.team
+    today = datetime.date.today()
+    happiness_avg = Happiness.objects.filter(team=team, date=today).aggregate(happiness_avg=Avg('happiness_level'))
+    happiness_level_user_count = Happiness.objects.filter(team=team, date=today).values('happiness_level').annotate(user_count=Count('user')).order_by('-happiness_level')
+    data = dict(happiness_level_user_count=happiness_level_user_count, happiness_avg=happiness_avg)
+    return Response(data)

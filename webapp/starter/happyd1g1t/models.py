@@ -57,14 +57,16 @@ class Employee(models.Model):
 
 class Happiness(models.Model):
     class Meta:
-        ordering = ['happiness_level']
+        ordering = ['date']
         unique_together = ('user', 'date')
 
     def __str__(self):
         return str(self.happiness_level)
 
     def save(self, *args, **kwargs):
+        today = datetime.date.today()
         self.team = self.user.team
+        self.date = today
         super().save(*args, **kwargs)
 
     happiness_level = models.IntegerField(default=HAPPINESS_LEVEL.NEUTRAL, choices=HAPPINESS_LEVEL.choices)

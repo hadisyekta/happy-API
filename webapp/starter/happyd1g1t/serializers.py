@@ -5,12 +5,18 @@ from rest_framework.validators import UniqueForDateValidator
 
 from .models import Employee, Team, Happiness, HAPPINESS_LEVEL
 
-
 class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
         fields = ('name', 'slug', 'is_active')
+
+class EmployeeSerializer(serializers.ModelSerializer):
+    team = TeamSerializer(required=True, allow_null=False)
+
+    class Meta:
+        model = Employee
+        fields = ('team', 'user')
 
 class HappinessSerializer(serializers.ModelSerializer):
     class Meta:
