@@ -53,8 +53,7 @@ class Employee(models.Model):
         name= self.user.first_name + " " + self.user.last_name if self.user.first_name else self.user.username          
         return str(name)
     
-
-
+ 
 class Happiness(models.Model):
     happiness_level = models.IntegerField(
         default=HappinessLevel.NEUTRAL,

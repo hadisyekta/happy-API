@@ -13,5 +13,7 @@ urlpatterns = [
 
 
     path('', HappinessCreationView.as_view({'post': 'create'}), name='happiness-create'),
-  
+    path('report/', HappinessReportView.as_view({'get': 'list'})),
+        # Get happiness report: if not authenticated: Average happiness of all teams
+    #                      else: Average happiness of team and number of people in the same level
     ]
