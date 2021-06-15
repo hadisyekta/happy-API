@@ -34,7 +34,8 @@ class HappinessCreateViewTestCase(APITestCase):
                                 content_type="application/json")
         
         response_data = json.loads(response.content)
-        self.assertEqual('You must be part of a team to insert level of your happiness.', response_data['errors'])
+        self.assertEqual(403, response_data['status_code'])
+        # self.assertEqual('You must be part of a team to insert level of your happiness.', response_data['errors'])
 
     def test_happiness_create(self):
         self.client.credentials(HTTP_AUTHORIZATION=None)
@@ -43,9 +44,8 @@ class HappinessCreateViewTestCase(APITestCase):
         employee = Employee.objects.create(user=new_user, team=team)
         new_user.employee = employee
         new_user.save()
-        new_token = Token.objects.create(user=new_user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
-        self.api_authentication()
+        # new_token = Token.objects.create(user=new_user)
+        # self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
         self.client.login(username='newuser', password='some_strong_pass')
         
         happiness = {"happiness_level": 4}
@@ -55,14 +55,15 @@ class HappinessCreateViewTestCase(APITestCase):
                                 content_type="application/json")
 
         response_data = json.loads(response.content)
-        self.assertEqual([], response_data['errors'])
-
-
+        self.assertEqual(201, response_data['status_code'])
+        
+        # Test when user add another happiness in one day
         response = self.client.post(self.url,
                                 json.dumps(happiness),
                                 content_type="application/json")
         response_data = json.loads(response.content)
-        self.assertEqual('Each employee can add her/his level of happiness once time a day!', response_data['errors']['non_field_errors'][0])
+        self.assertEqual(400, response_data['status_code'])
+        # self.assertEqual('Each employee can add her/his level of happiness once time a day!', response_data['errors']['non_field_errors'][0])
 
     def test_happiness_data_create(self):
         self.client.credentials(HTTP_AUTHORIZATION=None)
@@ -71,9 +72,9 @@ class HappinessCreateViewTestCase(APITestCase):
         employee = Employee.objects.create(user=new_user, team=team)
         new_user.employee = employee
         new_user.save()
-        new_token = Token.objects.create(user=new_user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
-        self.api_authentication()
+        # new_token = Token.objects.create(user=new_user)
+        # self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
+        
         self.client.login(username='newuser2', password='some_strong_pass')
         happiness = {"happiness_level": 4}
         response = self.client.post(self.url,
@@ -81,8 +82,7 @@ class HappinessCreateViewTestCase(APITestCase):
                                 content_type="application/json")
 
         response_data = json.loads(response.content)
-        
-        self.assertEqual({'success': 'Your input has been accepted', 'errors': []}, response_data)
+        self.assertEqual(201, response_data['status_code'])
 
 
 
@@ -105,7 +105,8 @@ class HappinessReportViewTestCase(APITestCase):
     def test_happiness_report_auth_noteam(self):
         response = self.client.get(self.url)
         response_data = json.loads(response.content)
-        self.assertEqual("You must be part of a team to insert level of your happiness.", response_data['errors'])
+        self.assertEqual(403, response_data['status_code'])
+        # self.assertEqual("You must be part of a team to see the happiness report.", response_data['errors'])
 
     def test_happiness_report_auth(self):
         self.client.credentials(HTTP_AUTHORIZATION=None)
@@ -114,16 +115,14 @@ class HappinessReportViewTestCase(APITestCase):
         employee = Employee.objects.create(user=new_user, team=team)
         new_user.employee = employee
         new_user.save()
-        new_token = Token.objects.create(user=new_user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
-        self.api_authentication()
+        # new_token = Token.objects.create(user=new_user)
+        # self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
         self.client.login(username='newuser5', password='some_strong_pass')
         response = self.client.get(self.url)
         response_data = json.loads(response.content)
-        self.assertEqual([], response_data['errors'])
+        self.assertEqual(200, response_data['status_code'])
 
     def test_happiness_report_unauth(self):
-        # self.client.credentials(HTTP_AUTHORIZATION=None)
         self.client.logout()
         response = self.client.get(self.url)
         

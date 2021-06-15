@@ -17,7 +17,7 @@ class HappinessLevel:
     HIGHLY_SATISFACTORY = 10
 
     choices = [
-        (HIGHLY_UNSATISFACTORY,'Highly Unsatisfactory'), 
+        (HIGHLY_UNSATISFACTORY,'Highly Unsatisfactory'),
         (MOSTLY_UNSATISFACTORY,  'Mostly Unsatisfactory'), 
         (SOMEWHAT_UNSATISFACTORY, 'Somewhat Unsatisfactory'),
         (UNSATISFACTORY, 'Unsatisfactory'),

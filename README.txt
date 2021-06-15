@@ -40,4 +40,7 @@ I have provided unittest, however, I should add more test, and apply some change
 
 For second api, which provides different result for autheticated and unathenticated user,
  I added date filter, to have a per day aggregation.
+ 
+I can add anotehr API to get number of days and then provide a report during taht days.
+
 

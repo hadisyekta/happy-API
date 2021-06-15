@@ -31,7 +31,8 @@ class HappinessCreationView(viewsets.ViewSet):
             team = request.user.employee.team
         except:
             return Response({'success': None, 
-            'errors': 'You must be part of a team to insert level of your happiness.'})
+            'errors': 'You must be part of a team to insert level of your happiness.', 
+            'status_code': 403})
         # TODO: Cleaner way of adding employee to request data
         data = {
             **request.data,
@@ -41,8 +42,12 @@ class HappinessCreationView(viewsets.ViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            return Response({'success': 'Your input has been accepted', 'errors': []})
-        return Response({'success': None, 'errors': serializer.errors})
+            return Response({'success': 'Your input has been accepted', 
+            'errors': [],
+            'status_code': 201})
+        return Response({'success': None, 
+        'errors': serializer.errors, 
+        'status_code': 400})
 
 
 class HappinessReportView(viewsets.ViewSet):
@@ -75,7 +80,9 @@ class HappinessReportView(viewsets.ViewSet):
                 team = request.user.employee.team
             except:
                 return Response({'success': None, 
-                'errors': 'You must be part of a team to insert level of your happiness.'})
+                'errors': 'You must be part of a team to see the happiness report.', 
+                'status_code': 403
+                })
 
             today = datetime.date.today()
             team = request.user.employee.team
@@ -87,4 +94,5 @@ class HappinessReportView(viewsets.ViewSet):
         return Response({
                 'data': data,
                 'success': '',
-                'errors': []})
+                'errors': [], 
+                'status_code': 200})
