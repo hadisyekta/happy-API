@@ -31,5 +31,8 @@
         "WaitOnNormalExit",
         "RedirectOutput",
         "DjangoDebugging"
+    ],
+    "configurations": [
+    
     ]
 }

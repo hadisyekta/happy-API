@@ -1,3 +1,149 @@
+
+
+import json
+from django.contrib.auth.models import User
+from django.urls import reverse
 from django.test import TestCase
 
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APITestCase
+
+from happyd1g1t.models import Happiness, Employee, Team
+from happyd1g1t.serializers import HappinessSerializer
+
+
+
+# from rest_framework.test import APIClient
+
+# url = reverse("happyd1g1t:happiness-create")
+# client = APIClient()
+# response = client.post(url, {"happiness_level": 4, 'date':'2021-06-15'}, format='json')
+# assert response.status_code == 403
+
+# client.login(username='admin', password='admin')
+# response = client.post(url, {"happiness_level": 4, 'date':'2021-06-15'}, format='json')
+# assert response.status_code == 200
+
 # Create your tests here.
+class HappinessCreateViewTestCase(APITestCase):
+    url = reverse("happyd1g1t:happiness-create")
+
+    def setUp(self):
+        self.username = "hadiseh"
+        self.email = "hadis@d1g1t.com"
+        self.password = "some-strong-password"
+        
+        self.user = User.objects.create_user(self.username, self.email, self.password)
+        self.token = Token.objects.create(user=self.user)
+        self.client.login(username=self.username, password=self.password)
+        self.api_authentication()
+
+    def api_authentication(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+    def test_happiness_create_byuser_nonteam(self):
+        happiness = {"happiness_level": 4}
+        
+        response = self.client.post(self.url,
+                                json.dumps(happiness),
+                                content_type="application/json")
+        
+        response_data = json.loads(response.content)
+        self.assertEqual('You must be part of a team to insert level of your happiness.', response_data['errors'])
+
+    def test_happiness_create(self):
+        self.client.credentials(HTTP_AUTHORIZATION=None)
+        new_user = User.objects.create_user("newuser", "new@user.com", "some_strong_pass")
+        team = Team.objects.create(name='TestTeam', is_active=True)
+        employee = Employee.objects.create(user=new_user, team=team)
+        new_user.employee = employee
+        new_user.save()
+        new_token = Token.objects.create(user=new_user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
+        self.api_authentication()
+        self.client.login(username='newuser', password='some_strong_pass')
+        
+        happiness = {"happiness_level": 4}
+        
+        response = self.client.post(self.url,
+                                json.dumps(happiness),
+                                content_type="application/json")
+
+        response_data = json.loads(response.content)
+        self.assertEqual([], response_data['errors'])
+
+
+        response = self.client.post(self.url,
+                                json.dumps(happiness),
+                                content_type="application/json")
+        response_data = json.loads(response.content)
+        self.assertEqual('Each employee can add her/his level of happiness once time a day!', response_data['errors']['non_field_errors'][0])
+
+    def test_happiness_data_create(self):
+        self.client.credentials(HTTP_AUTHORIZATION=None)
+        new_user = User.objects.create_user("newuser2", "new2@user.com", "some_strong_pass")
+        team = Team.objects.create(name='TestTeam2', is_active=True)
+        employee = Employee.objects.create(user=new_user, team=team)
+        new_user.employee = employee
+        new_user.save()
+        new_token = Token.objects.create(user=new_user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
+        self.api_authentication()
+        self.client.login(username='newuser2', password='some_strong_pass')
+        happiness = {"happiness_level": 4}
+        response = self.client.post(self.url,
+                                json.dumps(happiness),
+                                content_type="application/json")
+
+        response_data = json.loads(response.content)
+        
+        self.assertEqual({'success': 'Your input has been accepted', 'errors': []}, response_data)
+
+
+
+class HappinessReportViewTestCase(APITestCase):
+    url = reverse("happyd1g1t:happiness-report")
+
+    def setUp(self):
+        self.username = "yekta"
+        self.email = "yekta@d1g1t.com"
+        self.password = "some-strong-password"
+        
+        self.user = User.objects.create_user(self.username, self.email, self.password)
+        self.token = Token.objects.create(user=self.user)
+        self.client.login(username=self.username, password=self.password)
+        self.api_authentication()
+
+    def api_authentication(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+    def test_happiness_report_auth_noteam(self):
+        response = self.client.get(self.url)
+        response_data = json.loads(response.content)
+        self.assertEqual("You must be part of a team to insert level of your happiness.", response_data['errors'])
+
+    def test_happiness_report_auth(self):
+        self.client.credentials(HTTP_AUTHORIZATION=None)
+        new_user = User.objects.create_user("newuser5", "new5@user.com", "some_strong_pass")
+        team = Team.objects.create(name='TestTeam1', is_active=True)
+        employee = Employee.objects.create(user=new_user, team=team)
+        new_user.employee = employee
+        new_user.save()
+        new_token = Token.objects.create(user=new_user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
+        self.api_authentication()
+        self.client.login(username='newuser5', password='some_strong_pass')
+        response = self.client.get(self.url)
+        response_data = json.loads(response.content)
+        self.assertEqual([], response_data['errors'])
+
+    def test_happiness_report_unauth(self):
+        # self.client.credentials(HTTP_AUTHORIZATION=None)
+        self.client.logout()
+        response = self.client.get(self.url)
+        
+        response_data = json.loads(response.content)
+        self.assertIn('happiness_avg_allteam', response_data['data'])
+
+
+   
