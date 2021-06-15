@@ -21,5 +21,5 @@ import happyd1g1t
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('', include('happyd1g1t.urls')),
+    path('happiness/', include('happyd1g1t.urls')),
 ]
