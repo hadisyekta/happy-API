@@ -1,15 +1,13 @@
 import datetime
 
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.db.models import Count, Q, Avg, Sum
+from django.db.models import Count, Avg
 
-from rest_framework import status, viewsets, serializers
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import viewsets
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from .serializers import TeamSerializer, HappinessSerializer
+from .serializers import HappinessSerializer
 from .models import Happiness
 
 
@@ -18,7 +16,7 @@ def apiOverview(request):
     api_urls = {
         'All APIs': 'apis/',
         'Create': 'happiness/',
-        'Happiness Per team': 'happiness/report',
+        'Happiness report': 'happiness/report',
     }
 
     return Response(api_urls)
@@ -47,11 +45,12 @@ class HappinessCreationView(viewsets.ViewSet):
         return Response({'success': None, 'errors': serializer.errors})
 
 
-
 class HappinessReportView(viewsets.ViewSet):
 
     def get_allteam_average(self):
-        happiness_avg_perteam = Happiness.objects.select_related('employee') \
+        today = datetime.date.today()
+        happiness_avg_perteam = Happiness.objects.filter(date=today) \
+        .select_related('employee') \
         .values('employee__team').order_by('-employee__team') \
         .annotate(happiness_avg_perteam=Avg('happiness_level')) \
         
@@ -67,7 +66,7 @@ class HappinessReportView(viewsets.ViewSet):
             .values('happiness_level') \
             .order_by('happiness_level') \
             .annotate(count=Count('happiness_level'))
-        return {**team_happiness_avg, 'happiness_level_user_count': happiness_level_user_count }
+        return {**team_happiness_avg, 'happiness_level_user_count': happiness_level_user_count}
 
     def list(self, request):
         if request.user.is_authenticated:
@@ -85,9 +84,7 @@ class HappinessReportView(viewsets.ViewSet):
 
         else:
             data = self.get_allteam_average()
-        
         return Response({
                 'data': data,
-                'success': '', 
-                'errors': []
-            })
+                'success': '',
+                'errors': []})

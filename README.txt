@@ -37,3 +37,7 @@ uWSGI==2.0.17.1
 I consider level of happiness between [1-10] according to https://buffer.com/resources/measuring-employee-satisfaction/
 I have provided unittest, however, I should add more test, and apply some changes.
 
+
+For second api, which provides different result for autheticated and unathenticated user,
+ I added date filter, to have a per day aggregation.
+

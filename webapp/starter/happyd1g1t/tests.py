@@ -1,9 +1,6 @@
-
-
 import json
 from django.contrib.auth.models import User
 from django.urls import reverse
-from django.test import TestCase
 
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
@@ -11,18 +8,6 @@ from rest_framework.test import APITestCase
 from happyd1g1t.models import Happiness, Employee, Team
 from happyd1g1t.serializers import HappinessSerializer
 
-
-
-# from rest_framework.test import APIClient
-
-# url = reverse("happyd1g1t:happiness-create")
-# client = APIClient()
-# response = client.post(url, {"happiness_level": 4, 'date':'2021-06-15'}, format='json')
-# assert response.status_code == 403
-
-# client.login(username='admin', password='admin')
-# response = client.post(url, {"happiness_level": 4, 'date':'2021-06-15'}, format='json')
-# assert response.status_code == 200
 
 # Create your tests here.
 class HappinessCreateViewTestCase(APITestCase):
