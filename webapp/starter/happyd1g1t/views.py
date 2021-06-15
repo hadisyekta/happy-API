@@ -88,10 +88,15 @@ def HappinessAVGTeam(request):
 def HappinessAggregateAVG(request):
     h = Happiness.objects.all()
     today = datetime.date.today()
-    happiness_avg_perteam = Happiness.objects.values('team').annotate(happiness_avg_perteam=Avg('happiness_level')).order_by('-team')
+    happiness_avg_perteam2 = Happiness.objects.values('team').annotate(happiness_avg_perteam=Avg('happiness_level')).order_by('-team')
+    happiness_avg_allteam2 = happiness_avg_perteam2.aggregate(happiness_avg_allteam=Avg('happiness_avg_perteam'))
+
+    happiness_avg_perteam = Happiness.objects.select_related('user').values('user__team').annotate(happiness_avg_perteam=Avg('happiness_level')).order_by('-team')
     happiness_avg_allteam = happiness_avg_perteam.aggregate(happiness_avg_allteam=Avg('happiness_avg_perteam'))
-    data = dict(happiness_avg_allteam= happiness_avg_allteam, happiness_avg_perteam=happiness_avg_perteam)
-    return Response(happiness_avg_allteam)
+    # data = dict(happiness_avg_allteam= happiness_avg_allteam, happiness_avg_perteam=happiness_avg_perteam)
+
+    data = dict(happiness_avg_allteam= happiness_avg_allteam, happiness_avg_allteam2=happiness_avg_allteam2)
+    return Response(data)
 
 
 @api_view(['GET'])
@@ -100,7 +105,13 @@ def HappinessStat(request):
     # if user has not team what should I do?! how can I reais 404 without try catch?
     team = request.user.employee.team
     today = datetime.date.today()
+    
     happiness_avg = Happiness.objects.filter(team=team, date=today).aggregate(happiness_avg=Avg('happiness_level'))
+    # I filtered by day othewise I should find aggregation on each user for all days
     happiness_level_user_count = Happiness.objects.filter(team=team, date=today).values('happiness_level').annotate(user_count=Count('user')).order_by('-happiness_level')
     data = dict(happiness_level_user_count=happiness_level_user_count, happiness_avg=happiness_avg)
+
+    happiness_avg_perteammate = Happiness.objects.filter(team=team).values('user').annotate(happiness_avg_peruser=Avg('happiness_level')).order_by('-user')
+    print(happiness_avg_perteammate)
+    data = dict(happiness_level_user_count=happiness_level_user_count, happiness_avg=happiness_avg, happiness_avg_perteammate=happiness_avg_perteammate)
     return Response(data)

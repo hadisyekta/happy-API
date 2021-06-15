@@ -3,7 +3,7 @@ import datetime
 from rest_framework import serializers
 from rest_framework.validators import UniqueForDateValidator
 
-from .models import Employee, Team, Happiness, HAPPINESS_LEVEL
+from .models import Employee, Team, Happiness, HappinessLevel
 
 class TeamSerializer(serializers.ModelSerializer):
 
@@ -19,15 +19,19 @@ class EmployeeSerializer(serializers.ModelSerializer):
         fields = ('team', 'user')
 
 class HappinessSerializer(serializers.ModelSerializer):
+    happiness_level = serializers.IntegerField(
+        min_value=HappinessLevel.HIGHLY_UNSATISFACTORY,
+        max_value=HappinessLevel.HIGHLY_SATISFACTORY
+    )
+    date = serializers.DateField(required=False, default=datetime.date.today())
+
     class Meta:
         model = Happiness
-        fields = ('happiness_level', 'date', 'user', 'team')
+        fields = ('happiness_level', 'date', 'employee')
         validators = [
             serializers.UniqueTogetherValidator(
                 queryset=Happiness.objects.all(),
-                fields=('user', 'date'),
-                message="Each user can add her/his level of happiness once time a day!"
+                fields=('employee', 'date'),
+                message="Each employee can add her/his level of happiness once time a day!"
             )
         ]
-    date = serializers.DateField(initial=datetime.date.today)
-    happiness_level = serializers.IntegerField(min_value=HAPPINESS_LEVEL.HIGHLY_UNSATISFACTORY, max_value=HAPPINESS_LEVEL.HIGHLY_SATISFACTORY)
