@@ -65,14 +65,13 @@ run:
 `python manage.py test`
 
 ## Images
-![user-employee](https://github.com/hadisyekta/happyd1g1t/tree/master/webapp/starter/statics/user-employee.PNG?raw=true)
-![admin](https://github.com/hadisyekta/happyd1g1t/tree/master/webapp/starter/statics/admin.PNG?raw=true)
-![creation](https://github.com/hadisyekta/happyd1g1t/tree/master/webapp/starter/statics/creation.PNG?raw=true)
-![creation-201](https://github.com/hadisyekta/happyd1g1t/tree/master/webapp/starter/statics/creation-201.PNG?raw=true)
-![creation-400](https://github.com/hadisyekta/happyd1g1t/tree/master/webapp/starter/statics/creation-400.PNG?raw=true)
-![creation-403](https://github.com/hadisyekta/happyd1g1t/tree/master/webapp/starter/statics/creation-403.PNG?raw=true)
-![error-notesm-report](https://github.com/hadisyekta/happyd1g1t/tree/master/webapp/statics/starter/error-notesm-report.PNG?raw=true)
-![auth-report](https://github.com/hadisyekta/happyd1g1t/tree/master/webapp/starter/statics/auth-report.PNG?raw=true)
-![unauth-report](https://github.com/hadisyekta/happyd1g1t/tree/master/webapp/starter/statics/unauth-report.PNG?raw=true)
+![user-employee](https://github.com/hadisyekta/happyd1g1t/blob/master/webapp/starter/statics/user-employee.PNG)
 
-https://github.com/hadisyekta/happyd1g1t/tree/master/webapp/starter/statics
+![admin](https://github.com/hadisyekta/happyd1g1t/blob/master/webapp/starter/statics/admin.PNG)
+![creation](https://github.com/hadisyekta/happyd1g1t/blob/master/webapp/starter/statics/creation.PNG
+![creation-201](https://github.com/hadisyekta/happyd1g1t/blob/master/webapp/starter/statics/creation-201.PNG)
+![creation-400](https://github.com/hadisyekta/happyd1g1t/blob/master/webapp/starter/statics/creation-400.PNG)
+![creation-403](https://github.com/hadisyekta/happyd1g1t/blob/master/webapp/starter/statics/creation-403.PNG)
+![error-notesm-report](https://github.com/hadisyekta/happyd1g1t/tree/master/webapp/statics/starter/error-notesm-report.PNG)
+![auth-report](https://github.com/hadisyekta/happyd1g1t/blob/master/webapp/starter/statics/auth-report.PNG)
+![unauth-report](https://github.com/hadisyekta/happyd1g1t/blob/master/webapp/starter/statics/unauth-report.PNG)
